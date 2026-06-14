@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.WfmFileDefMapper" >
+
+    <resultMap id="wfmFileInfoMap" type="com.ibm.waferview.wfm.vo.WfmFileInfo">
+        <result property="fileMd5sum"       column="FILE_MD5SUM" />
+        <result property="fileId"           column="FILE_ID" />
+        <result property="fileName"         column="FILE_NAME" />
+        <result property="fileSize"         column="FILE_SIZE" />
+        <result property="fileType"         column="FILE_TYPE" />
+        <result property="inUse"            column="IN_USE" />
+        <result property="filePurpose"      column="FILE_PURPOSE" />
+        <result property="isZipFormat"      column="IS_ZIP_FORMAT" />
+        <result property="fileContent"      column="FILE_CONTENT" />
+        <result property="lastUser"         column="LAST_USER" />
+        <result property="lastDatetime"     column="LAST_DATETIME" />
+        <result property="floorNo"          column="FLOOR_NO" />
+        <result property="floorName"          column="FLOOR_NAME" />
+    </resultMap>
+
+<!-- wfmFileInfoMap -->
+
+  <select id="listFileInfo"  resultMap="wfmFileInfoMap">
+    SELECT  FILE_MD5SUM, FILE_ID,  FILE_NAME, FILE_SIZE, FILE_TYPE, IN_USE, FILE_PURPOSE,FLOOR_NO,
+      (SELECT FLOOR_NAME FROM WFM_FLOOR_DEF WHERE WFM_FLOOR_DEF.FLOOR_ID = WFM_FILE_DEF.FLOOR_NO) AS FLOOR_NAME,
+      IS_ZIP_FORMAT, LAST_USER, LAST_DATETIME  FROM WFM_FILE_DEF
+       WHERE DELETE_FLAG = 'N'
+        <if test="fileMd5sum != null and fileMd5sum != ''">
+            and FILE_MD5SUM = #{fileMd5sum}
+        </if>        
+        <if test="fileId != null ">
+            and FILE_ID = #{fileId}
+        </if>
+        <if test="floorNo != null and floorNo != ''">
+          and FLOOR_NO = #{floorNo}
+        </if>
+      <if test="filePurpose != null and filePurpose != ''">
+            and FILE_PURPOSE = #{filePurpose}
+        </if>
+        <if test="inUse != null and inUse != ''">
+            and IN_USE = #{inUse}
+        </if>
+        
+        <if test="md5sumList != null ">
+           and FILE_MD5SUM in (
+              <foreach collection="md5sumList" index="index" item="md5sum" open=" " separator=", " close="  ">
+                    #{md5sum}
+               </foreach>
+               )
+        </if>
+          
+        order by LAST_DATETIME desc, FILE_MD5SUM, FILE_ID
+  </select>
+
+  <select id="dowloadFile"  resultMap="wfmFileInfoMap">
+    SELECT  FILE_MD5SUM, FILE_ID,  FILE_NAME, FILE_SIZE, FILE_TYPE, IN_USE, FILE_PURPOSE, FLOOR_NO,
+            IS_ZIP_FORMAT, FILE_CONTENT, LAST_USER, LAST_DATETIME  FROM WFM_FILE_DEF   
+       WHERE  DELETE_FLAG = 'N' 
+            and FILE_MD5SUM = #{md5sum}
+        order by FILE_MD5SUM, FILE_ID
+  </select>
+
+  
+  <update id="setFileInUse">
+    UPDATE WFM_FILE_DEF
+     SET IN_USE = #{inUse }
+    WHERE DELETE_FLAG = 'N' 
+       <if test="fileMd5sum != null and fileMd5sum != ''">
+        and FILE_MD5SUM = #{fileMd5sum}
+      </if> 
+      <if test="md5sumList != null ">
+           and FILE_MD5SUM in (
+              <foreach collection="md5sumList" index="index" item="md5sum" open=" " separator=", " close="  ">
+                    #{md5sum}
+               </foreach>
+               )
+      </if>
+  </update>
+  
+  <delete id="deleteFiles">
+    update WFM_FILE_DEF 
+    set DELETE_FLAG = 'Y', LAST_USER = #{lastUser}, LAST_DATETIME = current timestamp
+    WHERE FILE_MD5SUM in (
+       <foreach collection="md5sumList" index="index" item="md5sum" open=" " separator=" , " close="  ">
+            #{md5sum}
+       </foreach>
+       ) 
+  </delete>
+ 
+ 
+  <delete id="hardDeletedFile">
+    delete from WFM_FILE_DEF 
+     WHERE 1 = 1  
+       <if test="fileMd5sum != null and fileMd5sum != ''">
+           and FILE_MD5SUM = #{fileMd5sum}
+       </if> 
+       <if test="invalidDays != null ">
+           and DELETE_FLAG = 'Y' 
+           and (DAYS(current timestamp) - DAYS(LAST_DATETIME)) &gt; #{invalidDays} 
+       </if>
+  </delete>
+  
+  
+  <insert id="addFileInfo">
+    INSERT INTO  WFM_FILE_DEF
+       (FILE_MD5SUM, FILE_ID, FILE_NAME,     FILE_SIZE,    FILE_TYPE,   FILE_PURPOSE, FLOOR_NO,
+       IN_USE, IS_ZIP_FORMAT, FILE_CONTENT, DELETE_FLAG, LAST_USER, LAST_DATETIME)
+    VALUES 
+      <foreach collection="fileContents" index="fileIndex" item="item" open=" " separator=" , " close=" ">
+        (#{fileMd5sum}, #{fileIndex}, #{fileName}, #{fileSize}, #{fileType}, #{filePurpose}, #{floorNo},
+          'N', #{isZipFormat} , #{item}, 'N', #{lastUser}, current timestamp )
+      </foreach>
+  </insert>
+  
+  
+</mapper>

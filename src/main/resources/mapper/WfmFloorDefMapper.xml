@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.WfmFloorDefMapper" >
+
+    <resultMap id="wfmFileInfoMap" type="com.ibm.waferview.wfm.vo.WfmFloorDef">
+        <result property="floorId"          column="FLOOR_ID" />
+        <result property="floorName"        column="FLOOR_NAME" />
+        <result property="floorNo"          column="FLOOR_NO" />
+        <result property="validFlag"        column="VALID_FLAG" />
+        <result property="lastUser"         column="LAST_USER" />
+        <result property="lastDatetime"     column="LAST_DATETIME" />
+    </resultMap>
+
+  <select id="listFloorInfo"  resultMap="wfmFileInfoMap">
+      SELECT FLOOR_ID, FLOOR_NAME, FLOOR_NO, VALID_FLAG, LAST_USER, LAST_DATETIME  FROM WFM_FLOOR_DEF WHERE VALID_FLAG = 'Y'
+  </select>
+
+  
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.AdminMapper" >
+	<resultMap id="userMap" type="com.ibm.waferview.wfm.vo.User">
+		<result property="userId" column="user_id" />
+		<result property="passwd" column="password" />
+		<result property="userName" column="user_full_name" />
+		<result property="mailAddress" column="email_address" />
+		<result property="department" column="department" />  
+		<result property="telNo1" column="tel_no1" />
+		<result property="telNo2" column="tel_no2" />
+		<result property="telNo3" column="tel_no3" />
+		<result property="smsNo" column="sms_no" />
+		<result property="wechatId" column="wechat_id" />
+		<result property="lineId" column="line_id" />
+		<result property="enable" column="enable" />
+		<result property="lastUser" column="last_user" />
+		<result property="lastDatetime" column="last_datetime" />
+	</resultMap>
+	
+	<resultMap id="UserPrivilege" type="com.ibm.waferview.wfm.vo.UserPrivilege">
+		<result property="functionId" column="PRIV_ID" />
+        <result property="permission" column="PERMISSION" />
+    </resultMap>
+
+	
+	<!-- user start -->
+	
+  <select id="listUser" parameterType="com.ibm.waferview.wfm.vo.User" resultMap="userMap">
+  	SELECT * FROM V_MESDUSER f where 1=1
+	<!--SELECT * FROM FRUSER f LEFT JOIN USER_DEF u ON f.USER_ID=u.USER_ID  where 1=1-->
+    <if test="userId != null and userId != ''">
+        and f.user_id=#{userId}
+    </if>
+    <if test="userName != null and userName != ''">
+        and f.user_full_name like '%${userName}%'
+    </if>
+    <if test="mailAddress != null and mailAddress != ''">
+        and f.EMAIL_ADDRESS like '%${mailAddress}%'
+    </if>
+  <if test="telNo1 != null and telNo1 != ''">
+        and (f.tel_no1 like '%${telNo1}%' or f.tel_no2 like '%${telNo1}%' or f.tel_no3 like '%${telNo1}%')
+    </if>
+    <if test="smsNo != null and smsNo != ''">
+        and f.sms_no like '%${smsNo}%'
+    </if>
+    <if test="wechatId != null and wechatId != ''">
+        and f.wechat_id like '%${wechatId}%'
+    </if>
+     ORDER BY f.USER_ID
+</select>
+
+  <select id="listUserByIds"  resultMap="userMap">
+    SELECT * FROM V_MESDUSER f  where f.user_id in
+     <foreach collection="userIds" index="index" item="item" open="(" separator="," close=")">
+          #{item}
+      </foreach>
+      ORDER BY f.USER_ID
+  </select>
+<!-- user end -->
+  
+ 
+
+   <select id="selectUserById" parameterType="string" resultMap="userMap">
+      select * from V_MESDUSER where 1=1 and user_id = #{userId}
+                                         
+  </select>
+	<!--
+      <select id="getUserPrivilege" parameterType="string" resultMap="UserPrivilege">
+            SELECT  FRPRIVGRP_PRIV.PRIV_ID
+            FROM FRUSER, FRUSER_PRIVGRP, FRPRIVGRP, FRPRIVGRP_PRIV
+            WHERE FRUSER.D_THESYSTEMKEY = FRUSER_PRIVGRP.D_THESYSTEMKEY
+            AND FRUSER_PRIVGRP.PRIVGRP_KEY = FRPRIVGRP.PRIVGRP_KEY
+            AND FRPRIVGRP.D_THESYSTEMKEY = FRPRIVGRP_PRIV.D_THESYSTEMKEY
+            AND FRPRIVGRP.SUBSYSTEM_ID = 'WFM'
+            AND FRUSER.USER_ID = #{USERID}
+            AND FRPRIVGRP_PRIV.PERMISSION ='Y'
+            order by FRUSER.USER_ID
+      </select>
+      -->
+        <select id="getUserPrivilege" parameterType="string" resultMap="UserPrivilege">
+            SELECT DISTINCT  A.PRIV_ID,A.PERMISSION
+            FROM V_MESDUSERG_FUNC A
+            WHERE 1 = 1
+            AND A.USERG_ID IN (SELECT USERG_ID
+            FROM V_MESDUSER_GROUP
+            WHERE USER_ID = #{USERID} )
+            ORDER BY PRIV_ID
+        </select>
+
+
+
+
+    </mapper>

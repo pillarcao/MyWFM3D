@@ -1,0 +1,43 @@
+server:
+  port: 6080
+  shutdown: graceful
+  servlet:
+    context-path: /wfm-component-client
+eqpstatusupdate:
+  schedules: 0 */1 * * * ?
+updateVehicleData:
+  schedules: 1/5 * * * * ?
+jwt:
+  expiration: 3600000
+  header: Authorization
+  oneStepMinutes: 600
+  secret: mySecret
+  tokenHead: Bearer
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ibm.waferview.wfm.vo
+spring:
+  datasource:
+    driver-class-name: com.ibm.db2.jcc.DB2Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:db2://10.196.61.10:50001/CZMMDBD?currentSchema=WFM
+    username: ls2idev
+    password: ls2idev
+    druid:
+      validation-query: select current timestamp from sysibm.sysdummy1  # 验证数据库服务可用性的sql.用来检测连接是否有效的sql
+  messages:
+    basename: i18n/messages
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+logging:
+  config: classpath:log4j.xml
+  level:
+    com:
+      ibm:
+        waferview:
+          wfm:
+            dao: DEBUG
+mcp:
+  mcpName: MCP

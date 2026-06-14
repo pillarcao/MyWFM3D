@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.WfmMiscMapper" >
+
+	<resultMap id="miscDataMap" type="com.ibm.waferview.wfm.vo.MiscData">
+    	    <result property="category"     column="CATEGORY" />
+            <result property="item"         column="ITEM" />
+            <result property="value"        column="VALUE" />
+            <result property="showOrder"    column="SHOW_ORDER" />
+            <result property="value1"       column="VALUE1" />
+            <result property="value2"       column="VALUE2" />
+            <result property="value3"       column="VALUE3" />
+            <result property="value4"       column="VALUE4" />
+            <result property="memo"         column="MEMO" />
+            <result property="enable"       column="ENABLE" />
+            <result property="lastUser"     column="LAST_USER" />
+            <result property="lastDatetime" column="LAST_DATETIME" />  
+	</resultMap>
+
+
+
+
+
+
+
+  <select id="listMiscData"  resultMap="miscDataMap">
+  	SELECT  * FROM WFM_MISC   
+	   WHERE 1 = 1 
+    <if test="category != null and category != ''">
+        and CATEGORY=#{category}
+    </if>
+    <if test="item != null and item != ''">
+        and ITEM=#{item}
+    </if>
+     order by SHOW_ORDER
+  </select>
+  
+  <select id="listMiscDataByItems"  resultMap="miscDataMap">
+  	SELECT  * FROM WFM_MISC   
+	   WHERE  CATEGORY=#{category} and ITEM in (
+       <foreach collection="items"  item="item" open=" " separator=" , " close=" ">
+          #{item}
+       </foreach>
+        ) order by SHOW_ORDER
+  </select>
+  
+  
+  <select id="getMiscData"  resultMap="miscDataMap">
+  	SELECT  * FROM WFM_MISC   
+	   WHERE CATEGORY=#{category} and ITEM=#{item}
+  </select>
+    
+<!--   <delete id="deleteMiscData" > -->
+<!--   	DELETE from WFM_MISC where CATEGORY=#{category} and ITEM=#{item} -->
+<!--   </delete> -->
+
+  <update id="updateMiscData">
+      UPDATE WFM_MISC
+    SET VALUE=#{value}, SHOW_ORDER=#{showOrder}, VALUE1=#{value1}, VALUE2=#{value2}, VALUE3=#{value3}, VALUE4=#{value4}, 
+        MEMO=#{memo}, ENABLE=#{enable}, LAST_USER=#{lastUser}, LAST_DATETIME= current timestamp
+    WHERE CATEGORY=#{category} AND ITEM=#{item}
+  
+  </update>
+
+
+
+<!-- uploadFileInfoMap -->
+
+  
+</mapper>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.WfmMonitorMapper" >
+
+	<resultMap id="eqpStatusMap" type="com.ibm.waferview.wfm.vo.EqpStatus">
+        <result property="eqpId" column="EQP_ID" />
+        <result property="eqpName" column="EQP_NAME" />
+        <result property="eqpCategory"   column="EQP_CATEGORY" />
+        <result property="eqpMode"       column="EQP_MODE" />
+        <result property="e10State"      column="E10_STATE" />
+        <result property="curStateId"    column="CUR_STATE_ID" />
+        <result property="stateChgTime"  column="STATE_CHG_TIME" />
+	</resultMap>                           
+
+	<resultMap id="eqpChamberStatusMap" type="com.ibm.waferview.wfm.vo.EqpChamberStatus">
+		  <result property="eqpId"       column="EQP_ID" />
+          <result property="eqpName"     column="EQP_NAME" />
+          <result property="chamberId"   column="CHAMBER_ID" />
+          <result property="processId"   column="PROCESS_ID" />
+          <result property="e10State"    column="E10_STATE" />  
+          <result property="eqpStateId"  column="EQP_STATE_ID" />  
+	</resultMap>
+    
+    
+	<resultMap id="eqpStateDefMap" type="com.ibm.waferview.wfm.vo.EqpStateDefine">
+          <result property="eqpStateId"    column="EQPSTATE_ID" />  
+          <result property="e10StateId"    column="E10_STATE_ID" />  
+	</resultMap>
+    
+	<resultMap id="eqpPortStatusMap" type="com.ibm.waferview.wfm.vo.EqpPortStatus">
+		  <result property="eqpId"       column="EQP_ID" />
+          <result property="mcpPortID"   column="MCP_PORT_ID" />
+          <result property="portId"      column="PORT_ID" />  
+          <result property="portState"   column="PORT_STATE" />  
+	</resultMap>
+    
+    <resultMap id="eqpLotCntMap" type="com.ibm.waferview.wfm.vo.EqpLotCount">
+          <result property="eqpId"     column="EQP_ID" />  
+          <result property="lotType"   column="LOT_TYPE" />  
+          <result property="lotCount"  column="LOT_COUNT" />  
+    </resultMap>
+    
+    <resultMap id="eqpInprocessLotMap" type="com.ibm.waferview.wfm.vo.EqpInprocessLot">
+          <result property="eqpId"           column="EQP_ID" />  
+          <result property="theSystemKey"    column="D_THESYSTEMKEY" />  
+          <result property="inprocessLotId"  column="INPROCESS_LOT_ID" />  
+          <result property="subLotId"        column="SUBLOT_ID" />  
+          <result property="curSublotWafCnt" column="CUR_SUBLOT_WAF_CNT" />
+          <result property="opeStartPortId"  column="OPE_START_PORT_ID" />
+          <result property="opeStartDttm"    column="OPE_START_DTTM" />
+          <result property="opeStartUserId"  column="OPE_START_USER_ID" />
+          <result property="carId"           column="CAR_ID" />
+    </resultMap>
+    
+    <resultMap id="wipInfoMap" type="com.ibm.waferview.wfm.vo.EqpWipInfo">
+        <result property="eqpId"              column="EQP_ID" /> 
+        <result property="lotId"              column="LOT_ID" />  
+        <result property="subLotId"           column="SUBLOT_ID" />  
+        <result property="subLotStat"         column="SUBLOT_STAT" />  
+        <result property="opeName"            column="OPE_NAME" />  
+        <result property="stateChgTime"       column="STATE_CHG_TIME" />  
+        <result property="lotType"            column="LOT_TYPE" />  
+        <result property="curSublotWafCnt"    column="CUR_SUBLOT_WAF_CNT" />
+        <result property="carId"              column="CAR_ID" />
+    </resultMap>
+
+    <resultMap id="eqpStatusChangeHisMap" type="com.ibm.waferview.wfm.vo.EqpStatusChangeHis">
+         <result property="eventCreateTime"   column="EVENT_CREATE_TIME" />  
+         <result property="areaId"            column="AREA_ID" />  
+         <result property="eqpId"             column="EQP_ID" />  
+         <result property="claimUserId"       column="CLAIM_USER_ID" />  
+         <result property="claimMemo"         column="CLAIM_MEMO" />  
+         
+         <result property="e10State"          column="E10_STATE" />  
+         <result property="eqpState"          column="EQP_STATE" />  
+         
+         <result property="newE10State"       column="NEW_E10_STATE" />  
+         <result property="newEqpmentState"   column="NEW_EQPMENT_STATE" />  
+         
+         <result property="startTime"         column="START_TIME" />  
+         <result property="endTime"           column="END_TIME" />  
+    </resultMap> 
+       
+    <resultMap id="alarmHisMap" type="com.ibm.waferview.wfm.vo.AlrmHisInfo">
+        <result property="eqpId"              column="EQP_ID" /> 
+        <result property="almDttm"            column="ALM_DTTM" />  
+        <result property="almId"              column="ALM_ID" />  
+        <result property="almCode"            column="ALM_CODE" />  
+        <result property="almStat"            column="ALM_STAT" />  
+        <result property="almText"            column="ALM_TEXT" />  
+    </resultMap>
+
+    <resultMap id="mcpInfo" type="com.ibm.waferview.wfm.vo.McpInfo">
+        <result property="mcpName"            column="MCP_NAME" />
+        <result property="crtlState"          column="CTRL_STAT" />
+        <result property="tcsState"           column="TSC_STAT" />
+        <result property="alarmState"         column="ALARM_STAT" />
+        <result property="fillColor"          column="COLOR" />
+    </resultMap>
+
+    <resultMap id="vehicleInfo" type="com.ibm.waferview.wfm.vo.VehicleInfo">
+        <result property="vehicleName"        column="VEHICLE_NAME" />
+        <result property="state"              column="STAT" />
+        <result property="emptyFlag"          column="EMPTY_FLG" />
+        <result property="currentLocation"    column="CUR_LOCATION" />
+        <result property="currentDistance"    column="CUR_DISTANCE" />
+        <result property="nextLocation"       column="NEXT_LOCATION" />
+        <result property="carID"              column="CAR_ID" />
+        <result property="dest"               column="DEST" />
+        <result property="fillColor"          column="COLOR" />
+    </resultMap>
+
+    <resultMap id="stationInfo" type="com.ibm.waferview.wfm.vo.StationInfo">
+        <result property="stationID"            column="STATION_ID" />
+        <result property="mcpPort"          column="MCP_PORT" />
+        <result property="state"           column="STAT" />
+        <result property="carID"         column="CAR_ID" />
+        <result property="carStats"          column="CARSTATS" />
+        <result property="destPortID"          column="DEST_PORT_ID" />
+        <result property="color"          column="COLOR" />
+    </resultMap>
+
+    
+  <select id="listEqpStatus"  resultMap="eqpStatusMap">
+      SELECT * FROM (
+      SELECT  EQP_ID ,EQP_NAME, EQP_CATEGORY, EQP_MODE, E10_STATE, CUR_STATE_ID, STATE_CHG_TIME, ROW_NUMBER() OVER(PARTITION BY EQP_ID ORDER BY STATE_CHG_TIME DESC ) AS RN
+      FROM V_MESDEQP ) WHERE  RN = 1  AND
+      EQP_ID in (
+           <foreach collection="eqpIds"  item="eqpId" open=" " separator=" , " close=" ">
+              #{eqpId}
+           </foreach>
+            ) ORDER BY EQP_ID
+  </select>
+  
+  
+  <select id="listEqpStateDef"  resultMap="eqpStateDefMap">
+  	 SELECT EQPSTATE_ID, E10_STATE_ID  FROM V_MESDEQP_STAT 
+        WHERE 1=1 
+  </select>
+  
+  <select id="listEqpChamberStatus"  resultMap="eqpChamberStatusMap">
+  	 SELECT EQP_ID,EQP_NAME,PROCESS_ID, CHAMBER_ID, E10_STATE, EQP_STATE_ID
+        FROM V_MESDEQP_CHAMBERSTAT WHERE EQP_ID in (
+       <foreach collection="eqpIds"  item="eqpId" open=" " separator=" , " close=" ">
+          #{eqpId}
+       </foreach>
+        ) ORDER BY EQP_ID, CHAMBER_ID
+  </select>
+  
+  
+  <select id="listEqpPortStatus"  resultMap="eqpPortStatusMap">
+  	 SELECT trim(EQP_ID) as EQP_ID,trim(MCP_PORT_ID) AS MCP_PORT_ID, PORT_ID, PORT_STATE FROM V_MESDEQP_SUBSTAT
+        WHERE EQP_ID in (
+       <foreach collection="eqpIds"  item="eqpId" open=" " separator=" , " close=" ">
+          #{eqpId}
+       </foreach>
+        ) ORDER BY EQP_ID, PORT_ID
+  </select>
+  
+  
+  <select id="getInprocessLot"  resultType="java.lang.Integer">
+    SELECT count(B.D_THESYSTEMKEY) FROM FREQP_LOT B WHERE B.D_THESYSTEMKEY IN 
+        (SELECT A.D_THESYSTEMKEY FROM FREQP A WHERE A.EQP_ID = #{eqpId} )
+  </select>
+  
+  
+  <select id="getWipCount"  resultType="java.lang.Integer">
+    SELECT count(*) FROM FRLOT WHERE LOT_FINISHED_STATE &lt;&gt; 'EMPTIED' 
+    	AND LOT_INV_STATE = 'OnFloor' AND LOT_PROCESS_STATE = 'Waiting' 
+        <if test="lotType != null and lotType != '' and lotType != 'All'">
+            AND LOT_TYPE = #{lotType}
+        </if>
+    	AND D_THESYSTEMKEY IN 
+    	(SELECT DISTINCT D_THESYSTEMKEY FROM FRLOT_EQP WHERE EQP_ID = #{eqpId} )
+  </select>
+  
+  <select id="listWips"  resultMap="wipInfoMap">
+    SELECT EQP_ID,LOT_ID,SUBLOT_ID,SUBLOT_STAT,OPE_NAME,STATE_CHG_TIME,LOT_TYPE,CUR_SUBLOT_WAF_CNT,CAR_ID
+    FROM V_WIPLIST
+    WHERE EQP_ID like '${eqpId}%'
+  </select>
+
+  
+  <select id="listInprocessLot" resultMap="eqpLotCntMap">
+     SELECT trim(EQP_ID) as EQP_ID,COUNT(SUBLOT_ID) AS LOT_COUNT FROM V_INPROCESSLOT  
+     WHERE
+         <foreach collection="eqpIds"  item="eqpId" open=" " separator=" or " close=" ">
+             EQP_ID like '${eqpId}%'
+         </foreach>
+     GROUP BY EQP_ID
+  </select>
+  
+  <select id="listInprocessLotIds" resultMap="eqpInprocessLotMap">
+    SELECT trim(EQP_ID) as EQP_ID,D_THESYSTEMKEY,INPROCESS_LOT_ID 
+       FROM V_INPROCESSLOT 
+     WHERE
+         <foreach collection="eqpIds"  item="eqpId" open=" " separator=" or " close=" ">
+             EQP_ID like '${eqpId}%'
+         </foreach>
+  </select>
+  
+   <select id="listInprLotByEqp" resultMap="eqpInprocessLotMap">
+    SELECT eqp_id,sublot_id,cur_sublot_waf_cnt,car_id,ope_start_port_id,ope_start_dttm,ope_start_user_id
+       FROM V_INPROCESSLOT 
+     WHERE EQP_ID like '${eqpId}%'
+  </select>
+  
+  <select id="listWipCount"  resultMap="eqpLotCntMap">
+    SELECT trim(EQP_ID) as EQP_ID,LOT_TYPE,LOT_COUNT 
+      FROM V_WIPCOUNT  
+    WHERE
+         <foreach collection="eqpIds"  item="eqpId" open=" " separator=" or " close=" ">
+             EQP_ID like '${eqpId}%'
+         </foreach>
+  </select>
+
+  <select id="listEqpStatusChangeHis"  resultMap="eqpStatusChangeHisMap">
+    SELECT event_create_time, AREA_ID, EQP_ID, 
+        E10_STATE, EQP_STATE, 
+        NEW_E10_STATE, NEW_EQPMENT_STATE, 
+        CLAIM_USER_ID, CLAIM_MEMO,  
+        START_TIME,  END_TIME 
+      FROM FHESCHS WHERE eqp_id = #{eqpId} ORDER BY event_create_time desc 
+  </select>
+
+  <select id="listAlarmHis"  resultMap="alarmHisMap">
+    SELECT eqp_id,alm_dttm,alm_id,alm_code,alm_stat,alm_text FROM V_ALRM_HIS
+      WHERE eqp_id like '${eqpId}%' ORDER BY alm_dttm DESC FETCH FIRST 100 ROWS ONLY
+  </select>
+
+    <select id="listPortStates"  resultType="String" >
+        SELECT DISTINCT vs.port_state  FROM V_MESDEQP_SUBSTAT vs WHERE 1=1
+    </select>
+
+    <select id="listEqpCategory"  resultType="String" >
+        SELECT trim(FLD_VAL) AS FLD_VAL FROM SYSDATA s  WHERE FLD_NAME = 'EQP_CAT'
+    </select>
+
+    <select id="listEqpMode"  resultType="String" >
+        SELECT trim(FLD_VAL) AS FLD_VAL FROM SYSDATA s  WHERE FLD_NAME = 'EQP_MODE'
+    </select>
+
+    <select id="getMcpInfo"  resultMap="mcpInfo" >
+        SELECT MCP_NAME,CTRL_STAT,TSC_STAT,ALARM_STAT,COALESCE(COLOR, '') AS COLOR FROM V_MCP_ONLINE_SR mcp
+        LEFT JOIN WFM_COLOR_DEF cdf ON cdf.CATEGORY='COLOR_MCP_STATE_BG' AND mcp.CTRL_STAT = cdf.ITEM
+        WHERE MCP_NAME = #{mcpName}
+    </select>
+
+    <select id="listVehicleInfo"  resultMap="vehicleInfo" >
+        SELECT VEHICLE_NAME,STAT,EMPTY_FLG,CUR_LOCATION,CUR_DISTANCE,NEXT_LOCATION,CAR_ID,sd.PORT_ID AS DEST,COALESCE(COLOR, '') AS COLOR
+        FROM V_MCP_VEHICLE_SR vhc LEFT JOIN WFM_COLOR_DEF cdf
+        ON cdf.CATEGORY='COLOR_VHC_STATE_BG' AND vhc.STAT = cdf.ITEM
+        LEFT JOIN WFM_STATION_DEF sd ON vhc.DEST = sd.STATION_ID
+        WHERE MCP_NAME = #{mcpName} ORDER BY VEHICLE_NAME
+    </select>
+
+    <select id="listMcpStation"  resultMap="stationInfo" >
+        SELECT sd.STATION_ID,MCP_PORT,STAT,CAR_ID,CARSTATS,DEST_PORT_ID,cdf.COLOR FROM V_MCP_STATION_SR st
+        LEFT JOIN WFM_STATION_DEF sd ON st.MCP_PORT = sd.PORT_ID
+        LEFT JOIN WFM_COLOR_DEF cdf ON cdf.CATEGORY='COLOR_STATION_STATE_BG' AND st.CARSTATS = cdf.ITEM
+        WHERE MCP_NAME = #{mcpName} AND sd.STATION_ID IS NOT NULL ORDER BY MCP_PORT
+    </select>
+
+</mapper>

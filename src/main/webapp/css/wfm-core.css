@@ -1,0 +1,74 @@
+/* --------------------------------------------------------------------------
+ * WFM Core
+ * -------------------------------------------------------------------------- */
+.wfm-container {
+	font-family: "Meiryo UI", "銉°偆銉偑", Meiryo, "锛汲 锛般偞銈枫儍銈�", "MS PGothic", sans-serif;
+	font-weight: bold;
+}
+
+.wfm-contextmenu {
+	margin: 0;
+	position: absolute;
+	min-width: 150px;
+	max-width: 250px;
+	padding: 2px;
+	line-height: 12pt;
+	/* color: #000000; */
+	/* background-color: #eeeeee; */
+	background-color: #f0f0f0;
+	border: 1px solid #979797;
+	box-shadow: 2px 2px 4px 0px #666666;
+	font-size: 9pt;
+	/* visibility: hidden; */
+}
+
+.wfm-contextmenu hr {
+	color: #979797;
+	background-color: #979797;
+	height: 1px;
+	border: 0;
+}
+
+.wfm-contextmenu a {
+	display: block;
+	padding: 2px 2px 2px 10px;
+	text-decoration: none;
+	/* color: #000000; */
+	cursor: default;
+}
+
+.wfm-contextmenu li {
+	border: 1px solid transparent;
+	list-style: none;
+/*
+	white-space: nowrap;
+*/
+}
+
+.wfm-contextmenu li.link:hover {
+	border: 1px solid #78aee5;
+	background-color: #d1e2f2;
+}
+
+/*
+.wfm-outlinetext {
+	color: #ffffff;
+	filter: dropshadow(color = #303030, offX = 0, offY = -0.5)
+		dropshadow(color = #303030, offX = 0.5, offY = 0)
+		dropshadow(color = #303030, offX = 0, offY = 0.5)
+		dropshadow(color = #303030, offX = -0.5, offY = 0);
+	-webkit-text-stroke-color: #303030;
+	-webkit-text-stroke-width: 0.5px;
+	text-shadow: black 1px 1px 0px, black -1px 1px 0px, black 1px -1px 0px, black
+		-1px -1px 0px;
+}
+*/
+
+.wfm-outlinetext {
+	font-family: "Arial","Meiryo UI", "Calibri", Meiryo, "锛汲 锛般偞銈枫儍銈�", "MS PGothic", sans-serif;
+	font-weight: bold;
+}
+
+.wfm-eqptid {
+	font-size: 2px;
+}

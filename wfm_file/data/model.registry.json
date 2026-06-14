@@ -1,0 +1,28 @@
+{
+ "DZ01": {
+  "source": "gltf",
+  "url": "models/demo_eqp.gltf",
+  "transform": {
+   "scaleToFootprint": true,
+   "rotateY": 0,
+   "offsetY": 0
+  },
+  "portNodeMap": {
+   "P1": "Port_1",
+   "P2": "Port_2"
+  }
+ },
+ "BS21": {
+  "source": "gltf",
+  "url": "models/demo_eqp.gltf",
+  "transform": {
+   "scaleToFootprint": true,
+   "rotateY": 0,
+   "offsetY": 0
+  },
+  "portNodeMap": {
+   "01": "Port_1",
+   "02": "Port_2"
+  }
+ }
+}

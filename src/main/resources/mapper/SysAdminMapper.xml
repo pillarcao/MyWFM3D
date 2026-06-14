@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.SysAdminMapper" >
+	<resultMap id="menuMap" type="com.ibm.waferview.wfm.vo.Menu">
+		<result property="menuId" column="menu_id" />
+		<result property="menuName" column="menu_name" />
+		<result property="href" column="href" />
+		<result property="menuDesc" column="menu_desc" />
+		<result property="menuType" column="menu_type" />
+		<result property="menuLvl" column="menu_lvl" />
+		<result property="parentId" column="parent_id" />
+		<result property="enable" column="enable" />
+		<result property="showOrder" column="show_order" />
+		<result property="privid" column="privid" />
+	</resultMap>
+
+  <select id="listMenu" resultMap="menuMap">
+  	select * from WFM_MENU where enable='Y' order by PARENT_ID, show_order asc
+  </select>
+
+</mapper>

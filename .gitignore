@@ -1,0 +1,12 @@
+/target/
+/.settings/
+/log/
+/WfmClient/
+.classpath
+.project
+/.apt_generated/
+/.apt_generated_tests/
+
+# OS / temp
+.DS_Store
+wfm_file/data/*.bak

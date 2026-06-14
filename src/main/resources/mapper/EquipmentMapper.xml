@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.EquipmentMapper" >
+	<resultMap id="eqpMap" type="com.ibm.waferview.wfm.vo.EqpDef">
+		<result property="eqpId" column="eqp_id" />
+		<result property="eqpName" column="eqp_name" />
+		<result property="eqpMode" column="eqp_mode" />
+		<result property="recipId" column="recip_id" />
+		<result property="e10State" column="e10_state" />
+		<result property="eqpDesc" column="description" />
+		<result property="lastUser" column="claim_user_id" />
+		<result property="lastDatetime" column="claim_time" />
+	</resultMap>
+	
+	
+	<resultMap id="userEqpRelMap" type="com.ibm.waferview.wfm.vo.UserEqpRelDef">
+		<result property="userId" column="user_id" />
+		<result property="eqpId" column="eqp_id" />
+		<result property="showOrder" column="SHOW_ORDER" />
+		<result property="lastUser" column="last_user" />
+		<result property="lastDatetime" column="last_datetime" />
+	</resultMap>
+
+
+	<!-- eqp start -->
+  <select id="listEqp" parameterType="com.ibm.waferview.wfm.vo.EqpDef" resultMap="eqpMap">
+  	<!-- select * from eqp_def where 1=1  -->
+  	select * from V_MESDEQP where 1=1
+  	<if test="eqpId != null and eqpId != ''">
+  		and eqp_id=#{eqpId}
+  	</if>
+  	<if test="eqpDesc != null and eqpDesc != ''">
+  		and description like '%${eqpDesc}%'
+  	</if>
+    ORDER BY eqp_id
+  </select>
+	
+    
+  <select id="listEqpIds" parameterType="com.ibm.waferview.wfm.vo.EqpDef" resultType="java.lang.String">
+	  SELECT DISTINCT EQP_ID FROM V_MESDEQP WHERE 1=1
+  	<if test="eqpId != null and eqpId != ''">
+  		and eqp_id=#{eqpId}
+  	</if>
+  	<if test="eqpDesc != null and eqpDesc != ''">
+  		and description like '%${eqpDesc}%'
+  	</if>
+    ORDER BY EQP_ID
+  </select>
+  
+  
+  <select id="listEqpIdsByUserId"  resultMap="userEqpRelMap">
+  	SELECT  * FROM WFM_USER_EQP_DEF   
+	   WHERE USER_ID = #{userId}  ORDER  BY SHOW_ORDER
+  </select>
+  
+  
+  <delete id="deleteUserEqpsByUserId" >
+  	DELETE from WFM_USER_EQP_DEF where USER_ID = #{userId} 
+  </delete>
+
+  
+  <insert id="batchAddUserEqps" parameterType="com.ibm.waferview.wfm.vo.UserEqpRelDef" useGeneratedKeys="false">
+    INSERT INTO WFM_USER_EQP_DEF
+        (USER_ID, EQP_ID, SHOW_ORDER, LAST_USER, LAST_DATETIME)
+        VALUES  
+      <foreach collection="eqpIds" index="index" item="eqpId" open=" " separator=" , " close="  ">
+          ( #{userId},
+           #{eqpId},
+           #{index},
+           #{userId},
+           current timestamp )
+       </foreach>
+  </insert>
+  
+  
+</mapper>

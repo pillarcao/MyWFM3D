@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.ibm.waferview.wfm.dao.WfmColorMapper" >
+
+	<resultMap id="wfmColorRelMap" type="com.ibm.waferview.wfm.vo.ColorDefine">
+		<result property="category" column="CATEGORY" />
+		<result property="item" column="ITEM" />
+		<result property="showOrder" column="SHOW_ORDER" />
+		<result property="color" column="COLOR" />
+		<result property="extField" column="EXT_FIELD" />
+		<result property="defaultColor" column="DEF_COLOR" />
+		<result property="lastUser" column="LAST_USER" />
+		<result property="lastDatetime" column="LAST_DATETIME" />
+	</resultMap>
+  
+  <select id="listColorDefines"  resultMap="wfmColorRelMap">
+  	SELECT  * FROM WFM_COLOR_DEF   
+	    ORDER BY CATEGORY, SHOW_ORDER
+  </select>
+  
+    <select id="listColorDefs"  resultMap="wfmColorRelMap">
+  	SELECT  * FROM WFM_COLOR_DEF   
+	    ORDER BY CATEGORY, SHOW_ORDER
+   </select>
+    <select id="listEqpStates"  resultType="String" >
+        SELECT FLD_VAL  FROM SYSDATA s WHERE FLD_NAME  = 'EQP_STAT'
+    </select>
+
+
+  <delete id="deleteColorDefine" >
+  	DELETE from WFM_COLOR_DEF where 1=1 and (
+      <foreach collection="colorDefines" index="index" item="colorDef" open=" " separator=" or " close="  ">
+          ( #{colorDef.category , jdbcType=VARCHAR } = CATEGORY and 
+            #{colorDef.item     , jdbcType=VARCHAR } = ITEM )
+       </foreach>
+       )
+  </delete>
+
+  
+  <insert id="batchAddColorDefines"  useGeneratedKeys="false">
+    INSERT INTO WFM_COLOR_DEF
+    (CATEGORY, ITEM, SHOW_ORDER, COLOR, EXT_FIELD, DEF_COLOR, LAST_USER, LAST_DATETIME)
+    VALUES  
+      <foreach collection="colorDefines" index="index" item="colorDef" open=" " separator=" , " close="  ">
+          ( #{colorDef.category  , jdbcType=VARCHAR },
+            #{colorDef.item      , jdbcType=VARCHAR },
+            #{colorDef.showOrder , jdbcType=INTEGER },
+            #{colorDef.color     , jdbcType=VARCHAR },
+            #{colorDef.extField  , jdbcType=VARCHAR },
+            #{colorDef.defaultColor , jdbcType=VARCHAR },
+            #{colorDef.lastUser   , jdbcType=VARCHAR },
+           current timestamp )
+       </foreach>
+  </insert>
+  
+</mapper>
