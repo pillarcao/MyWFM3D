@@ -1,7 +1,7 @@
 {
  "DZ01": {
   "source": "gltf",
-  "url": "models/demo_eqp.gltf",
+  "url": "models/fab_tool.gltf",
   "transform": {
    "scaleToFootprint": true,
    "rotateY": 0,
@@ -9,12 +9,13 @@
   },
   "portNodeMap": {
    "P1": "Port_1",
-   "P2": "Port_2"
+   "P2": "Port_2",
+   "P3": "Port_3"
   }
  },
  "BS21": {
   "source": "gltf",
-  "url": "models/demo_eqp.gltf",
+  "url": "models/fab_tool.gltf",
   "transform": {
    "scaleToFootprint": true,
    "rotateY": 0,
@@ -22,7 +23,8 @@
   },
   "portNodeMap": {
    "01": "Port_1",
-   "02": "Port_2"
+   "02": "Port_2",
+   "03": "Port_3"
   }
  }
 }

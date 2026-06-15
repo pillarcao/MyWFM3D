@@ -52,6 +52,10 @@ public class WfmAuthUserDetailsServiceImpl implements  UserDetailsService {
     	if(username!="NONE_PROVIDED"&&username!=null) {
     		
     	User sysUser=adminMapper.selectUserById(username);
+    	if (sysUser == null) {
+    		// 用户在当前库中不存在（如残留会话/迁移后），抛标准异常而非 NPE
+    		throw new UsernameNotFoundException("User not found: " + username);
+    	}
         user.setUserName(sysUser.getUserId());
         user.setUserPwd(new BCryptPasswordEncoder().encode(decodeMMPasswd(sysUser.getPasswd())));
         //user.setUserPwd(sysUser.getPasswd());

@@ -16,6 +16,12 @@ var g_modelDefs = {};
 var g_gltfLoader = null;
 var g_buildToken = 0;                  // 楼层重建令牌，丢弃过期的异步 glTF 回调
 
+// 未在注册表登记的设备，默认使用的基础模型（按端口顺序绑定到 Port_1..Port_N）
+var DEFAULT_MODEL_URL = "models/fab_tool.gltf";
+// glTF 模型缓存：同一 url 只加载/解析一次，之后克隆复用（支撑上百台设备）
+var g_modelCache = {};                 // url -> 模板 scene
+var g_modelPending = {};               // url -> [{onReady,onError}]
+
 var THREE_REF = window.THREE;
 
 // three.js 对象
@@ -192,7 +198,8 @@ function resolveModelEntry(eqpId, info) {
     if (g_modelDefs[eqpId]) { return g_modelDefs[eqpId]; }
     var cat = info.eqpStatus && info.eqpStatus.eqpCategory;
     if (cat && g_modelDefs["CAT:" + cat]) { return g_modelDefs["CAT:" + cat]; }
-    return null;
+    // 未登记 -> 使用默认基础模型（端口按顺序绑定）
+    return { source: "gltf", url: DEFAULT_MODEL_URL, portNodeMap: {}, isDefault: true };
 }
 
 // 加载某层：先取 SVG（几何来源），再取状态并建模
@@ -458,7 +465,23 @@ function addPort(eqpId, info, port, idx, total) {
     meshByPortId[portElId] = { box: box, label: label };
 }
 
-// 用真实 glTF 模型表示设备：按 SVG footprint 定位/缩放，端口状态绑定到命名节点
+// 取一个模型实例：同一 url 仅加载一次，之后返回克隆体（几何共享、材质按需克隆）
+function getModelInstance(url, onReady, onError) {
+    if (g_modelCache[url]) { onReady(g_modelCache[url].clone(true)); return; }
+    if (g_modelPending[url]) { g_modelPending[url].push({ onReady: onReady, onError: onError }); return; }
+    g_modelPending[url] = [{ onReady: onReady, onError: onError }];
+    g_gltfLoader.load(url, function (gltf) {
+        var tmpl = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+        g_modelCache[url] = tmpl;
+        var cbs = g_modelPending[url] || []; delete g_modelPending[url];
+        cbs.forEach(function (c) { try { c.onReady(tmpl.clone(true)); } catch (e) { if (c.onError) c.onError(e); } });
+    }, undefined, function (err) {
+        var cbs = g_modelPending[url] || []; delete g_modelPending[url];
+        cbs.forEach(function (c) { if (c.onError) c.onError(err); });
+    });
+}
+
+// 用 glTF 模型表示设备：按 SVG footprint 定位/缩放，端口状态绑定到模型节点
 function addEquipmentGltf(eqpId, info, rect, entry, token) {
     var c0 = toWorld(rect.x, rect.y);
     var c1 = toWorld(rect.x + rect.w, rect.y + rect.h);
@@ -468,9 +491,8 @@ function addEquipmentGltf(eqpId, info, rect, entry, token) {
     var cz = (c0.z + c1.z) / 2;
     var tf = entry.transform || {};
 
-    g_gltfLoader.load(entry.url, function (gltf) {
+    getModelInstance(entry.url, function (model) {
         if (token !== g_buildToken) { return; }       // 楼层已切换，丢弃
-        var model = gltf.scene || (gltf.scenes && gltf.scenes[0]);
         if (!model) { return; }
 
         // 缩放：默认把模型 XZ footprint 贴合设备矩形
@@ -512,8 +534,9 @@ function addEquipmentGltf(eqpId, info, rect, entry, token) {
         var ports = info.eqpPortStatusList || [];
         for (var i = 0; i < ports.length; i++) {
             var port = ports[i];
-            var nodeName = portNodeMap[port.portId];
-            var node = nodeName ? model.getObjectByName(nodeName) : null;
+            // 优先用注册表 portNodeMap；否则按顺序绑定到 Port_1..Port_N（默认模型）
+            var nodeName = portNodeMap[port.portId] || ("Port_" + (i + 1));
+            var node = model.getObjectByName(nodeName);
             if (node) {
                 var col = safeColor(port.portStateColor, "#ffe27a");
                 recolorObject(node, col);
@@ -529,7 +552,7 @@ function addEquipmentGltf(eqpId, info, rect, entry, token) {
                 addPort(eqpId, info, port, i, ports.length);
             }
         }
-    }, undefined, function (err) {
+    }, function (err) {
         console.error("glTF load failed for " + eqpId + " (" + entry.url + "), fallback to extrude.", err);
         if (token !== g_buildToken) { return; }
         addEquipment(eqpId, info, rect);

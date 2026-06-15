@@ -58,6 +58,8 @@ public class WfmAuthenticationTokenFilter extends OncePerRequestFilter {
 			".ttf",
 			".woff",
 			".woff2",
+			".glb",".gltf",".bin",
+			"preLogin","auth/login",
 			".less","getEqpStatusMaps","getEqpInfor","getOHTStatus",
 			"wfmWfviewEqpt","listInprLotByEqp","listWipByEqp","listAlarmHis");
     @Autowired
@@ -125,11 +127,19 @@ public class WfmAuthenticationTokenFilter extends OncePerRequestFilter {
             String authToken = authHeader.substring(tokenHead.length());
             String username = jwtTokenUtil.getUsernameFromToken(authToken);
             
-            if (!isTokenExpired  && username != null 
+            if (!isTokenExpired  && username != null
                     // && SecurityContextHolder.getContext().getAuthentication() == null
                     ) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtTokenUtil.validateToken(authToken, userDetails)) {
+                UserDetails userDetails = null;
+                try {
+                    userDetails = userDetailsService.loadUserByUsername(username);
+                } catch (Exception ex) {
+                    // 残留会话引用了当前库不存在的用户：清掉坏会话，不要 500
+                    log.warn("load user [{}] failed, clearing stale session: {}", username, ex.getMessage());
+                    if (session != null) { try { session.invalidate(); } catch (Exception ignore) {} }
+                    SecurityContextHolder.clearContext();
+                }
+                if (userDetails != null && jwtTokenUtil.validateToken(authToken, userDetails)) {
                     
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

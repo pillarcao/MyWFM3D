@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"/>
+<title>3D 设备模型预览 — fab_tool</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e1116;color:#cdd6e0;font-family:sans-serif;overflow:hidden}
+  #info{position:absolute;top:10px;left:12px;font-size:13px;line-height:1.6;z-index:10;
+        background:rgba(20,24,30,.6);padding:8px 12px;border-radius:6px}
+  #info b{color:#fff}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .v3d-label{color:#ffe27a;font-weight:600;font-size:11px;background:rgba(0,0,0,.5);
+             padding:0 3px;border-radius:2px;pointer-events:none;font-family:sans-serif}
+</style>
+</head>
+<body>
+<div id="info">
+  <b>FAB Cluster Tool — 模型预览</b><br/>
+  鼠标拖拽旋转 · 滚轮缩放 · 右键平移<br/>
+  端口示意色：<span class="sw" style="background:#33ff00"></span>LOADED
+  <span class="sw" style="background:#0033ff"></span>READY
+  <span class="sw" style="background:#ff0000"></span>ALARM
+  <span class="sw" style="background:#ffe27a"></span>默认
+</div>
+<div id="diag" style="position:absolute;bottom:10px;left:12px;right:12px;z-index:20;font-size:12px;
+     font-family:monospace;color:#9fb3c8;background:rgba(20,24,30,.7);padding:6px 10px;border-radius:6px;
+     max-height:40%;overflow:auto;white-space:pre-wrap"></div>
+<script>
+function diag(msg,color){var d=document.getElementById('diag');
+  d.innerHTML += (color?'<span style="color:'+color+'">'+msg+'</span>':msg)+'\n';}
+window.addEventListener('error', function(e){ diag('JS ERROR: '+(e.message||e.error)+' @ '+(e.filename||'')+':'+(e.lineno||''),'#f66'); });
+</script>
+<script src="../three/three.min.js" onerror="diag('three.min.js 加载失败','#f66')"></script>
+<script src="../three/OrbitControls.js" onerror="diag('OrbitControls.js 加载失败','#f66')"></script>
+<script src="../three/GLTFLoader.js" onerror="diag('GLTFLoader.js 加载失败','#f66')"></script>
+<script src="../three/CSS2DRenderer.js" onerror="diag('CSS2DRenderer.js 加载失败','#f66')"></script>
+<script>
+diag('THREE='+(window.THREE&&THREE.REVISION)+'  GLTFLoader='+(window.THREE&&typeof THREE.GLTFLoader)
+   +'  OrbitControls='+(window.THREE&&typeof THREE.OrbitControls)
+   +'  CSS2DRenderer='+(window.THREE&&typeof THREE.CSS2DRenderer));
+</script>
+<script>
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e1116);
+var camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.01, 1000);
+camera.position.set(2.2, 1.8, 2.4);
+
+var renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(devicePixelRatio||1);
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+var labelRenderer = new THREE.CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+labelRenderer.domElement.style.position='absolute';
+labelRenderer.domElement.style.top='0';
+labelRenderer.domElement.style.pointerEvents='none';
+document.body.appendChild(labelRenderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x445, 1.1));
+var dir = new THREE.DirectionalLight(0xffffff, 0.7); dir.position.set(3,5,2); scene.add(dir);
+
+var grid = new THREE.GridHelper(8, 32, 0x33415c, 0x222b3a); scene.add(grid);
+
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.target.set(0, 0.45, 0);
+
+// 端口示意状态色：演示端口绑定/着色效果
+var PORT_DEMO = { "Port_1":"#33ff00", "Port_2":"#0033ff", "Port_3":"#ff0000" };  // Port_4 保持默认黄
+
+function recolor(node, hex){
+  node.traverse(function(o){
+    if(o.isMesh && o.material){
+      o.material = o.material.clone();
+      o.material.color.set(hex);
+      if(o.material.emissive){ o.material.emissive.set(hex); o.material.emissiveIntensity=0.4; }
+    }
+  });
+}
+function label(text, pos){
+  var div=document.createElement('div'); div.className='v3d-label'; div.textContent=text;
+  var l=new THREE.CSS2DObject(div); l.position.copy(pos); scene.add(l);
+}
+
+new THREE.GLTFLoader().load("fab_tool.gltf", function(g){
+  var m = g.scene;
+  scene.add(m);
+  // 居中落地
+  var box=new THREE.Box3().setFromObject(m), c=box.getCenter(new THREE.Vector3());
+  m.position.x-=c.x; m.position.z-=c.z; m.position.y-=box.min.y;
+  // 端口示意着色 + 标签
+  ["Port_1","Port_2","Port_3","Port_4"].forEach(function(pn){
+    var n=m.getObjectByName(pn); if(!n) return;
+    if(PORT_DEMO[pn]) recolor(n, PORT_DEMO[pn]);
+    var wp=n.getWorldPosition(new THREE.Vector3());
+    label(pn, new THREE.Vector3(wp.x, wp.y+0.18, wp.z));
+  });
+  var top=new THREE.Box3().setFromObject(m).max.y;
+  controls.target.set(0, top*0.5, 0); controls.update();
+  diag('模型加载成功 ✓  节点: '+m.children.map(function(c){return c.name;}).join(', '),'#7bdc7b');
+}, function(p){ /* progress */ },
+   function(e){ console.error("glTF load failed", e);
+     var msg = e && (e.message || (e.target && ('HTTP '+e.target.status+' '+(e.target.responseURL||''))) || e.type) || e;
+     diag('模型加载失败: '+msg,'#f66');
+   });
+
+addEventListener('resize', function(){
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight); labelRenderer.setSize(innerWidth,innerHeight);
+});
+(function loop(){ requestAnimationFrame(loop); controls.update();
+  renderer.render(scene,camera); labelRenderer.render(scene,camera); })();
+</script>
+</body>
+</html>

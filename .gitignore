@@ -10,3 +10,6 @@
 # OS / temp
 .DS_Store
 wfm_file/data/*.bak
+
+# IDE
+.idea/
